@@ -1,0 +1,32 @@
+
+import pandas as pd
+from flask import Flask, render_template, request
+
+app = Flask(__name__)
+
+# Load your CSV data
+data1 = pd.read_csv('C:\\Users\\Rithesh\\OneDrive\\Documents\\combined.loksabha csv2.csv')
+
+@app.route('/', methods=['GET', 'POST'])
+def index():
+    winner_party = ""
+    winner_votes = ""
+    RunnerUp_Party = ""
+    RunnerUp_votes = ""
+    
+    if request.method == 'POST':
+        constituency_name = request.form['constituency_name']
+
+        # Find the row in the DataFrame where the Constituency column matches the input
+        matching_row = data1[data1['Constituency'] == constituency_name]
+
+        if not matching_row.empty:
+            winner_party = matching_row['Winner_Political_Party'].values[0]
+            winner_votes = matching_row['Winner_Votes'].values[0]
+            RunnerUp_Party = matching_row['RunnerUp_Political_Party'].values[0]
+            RunnerUp_votes = matching_row['RunnerUp_Votes'].values[0]
+
+    return render_template('index.html', winner_party=winner_party, winner_votes=winner_votes, RunnerUp_Party=RunnerUp_Party, RunnerUp_votes=RunnerUp_votes)
+
+if __name__ == '__main__':
+    app.run(debug=True)
